@@ -108,11 +108,16 @@ def token_auth(f):
                     _("Please enter valid credentials"),
                 )                
         else:
-            user = authenticate(
-                request=context,
-                username=username,
-                password=password,
-            )
+            user = get_user_model().objects.filter((Q(username__iexact=username) | Q(email__iexact=username)) & Q(ecommerce__iexact=0)).first()
+            if user:
+                if not user.check_password(password):
+                    raise exceptions.JSONWebTokenError(
+                        _("Please enter valid credentials"),
+                    ) 
+            else:
+                raise exceptions.JSONWebTokenError(
+                    _("Please enter valid credentials"),
+                ) 
         if user is None:
             raise exceptions.JSONWebTokenError(
                 _("Please enter valid credentials"),
