@@ -93,12 +93,20 @@ def token_auth(f):
         context = info.context
         context._jwt_token_auth = True
         username = kwargs.get(get_user_model().USERNAME_FIELD)
-
-        user = authenticate(
-            request=context,
-            username=username,
-            password=password,
-        )
+        ecommerce = kwargs.get(ecommerce)
+        if ecommerce and ecommerce == 'true':
+            user = authenticate(
+                request=context,
+                username=username,
+                password=password,
+                ecommerce=1,
+            )
+        else:
+            user = authenticate(
+                request=context,
+                username=username,
+                password=password,
+            )
         if user is None:
             raise exceptions.JSONWebTokenError(
                 _("Please enter valid credentials"),
