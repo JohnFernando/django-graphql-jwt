@@ -6,6 +6,8 @@ from django.contrib.auth import authenticate, get_user_model
 from django.middleware.csrf import rotate_token
 from django.utils.translation import gettext as _
 
+from django.db.models import Q
+
 from graphene.utils.thenables import maybe_thenable
 
 from . import exceptions, signals
@@ -95,7 +97,7 @@ def token_auth(f):
         username = kwargs.get(get_user_model().USERNAME_FIELD)
         ecommerce = kwargs.get('ecommerce')
         if ecommerce:
-            user = get_user_model().objects.filter((username=username | email=username) & ecommerce=1).first()
+            user = get_user_model().objects.filter((Q(username__iexact=username) | Q(email__iexact=username)) & Q(ecommerce__iexact=1)).first()
             if user:
                 if not user.check_password(password):
                     raise exceptions.JSONWebTokenError(
