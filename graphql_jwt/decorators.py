@@ -95,12 +95,16 @@ def token_auth(f):
         username = kwargs.get(get_user_model().USERNAME_FIELD)
         ecommerce = kwargs.get('ecommerce')
         if ecommerce:
-            user = authenticate(
-                request=context,
-                username=username,
-                password=password,
-                ecommerce=ecommerce,
-            )
+            user = get_user_model().objects.filter((username=username | email=username) & ecommerce=1).first()
+            if user:
+                if not user.check_password(password):
+                    raise exceptions.JSONWebTokenError(
+                        _("Please enter valid credentials"),
+                    ) 
+            else:
+                raise exceptions.JSONWebTokenError(
+                    _("Please enter valid credentials"),
+                )                
         else:
             user = authenticate(
                 request=context,
