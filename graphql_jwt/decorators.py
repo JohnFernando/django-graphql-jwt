@@ -96,7 +96,7 @@ def token_auth(f):
         context._jwt_token_auth = True
         username = kwargs.get(get_user_model().USERNAME_FIELD)
         ecommerce = kwargs.get('ecommerce')
-        if ecommerce:
+        if ecommerce is not None:
             user = get_user_model().objects.filter((Q(username__iexact=username) | Q(email__iexact=username)) & Q(ecommerce__iexact=1)).first()
             if user:
                 if not user.check_password(password):
