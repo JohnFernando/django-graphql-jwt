@@ -93,7 +93,7 @@ def token_auth(f):
         context = info.context
         context._jwt_token_auth = True
         username = kwargs.get(get_user_model().USERNAME_FIELD)
-        ecommerce = kwargs.get(ecommerce)
+        ecommerce = kwargs.get('ecommerce')
         if ecommerce and ecommerce == 'true':
             user = authenticate(
                 request=context,
