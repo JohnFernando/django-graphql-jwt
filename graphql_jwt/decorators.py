@@ -15,7 +15,6 @@ from .compat import GraphQLResolveInfo
 from .refresh_token.shortcuts import create_refresh_token, refresh_token_lazy
 from .settings import jwt_settings
 from .utils import delete_cookie, set_cookie
-from cmi.patrons.models import PatronsModel
 
 __all__ = [
     "user_passes_test",
