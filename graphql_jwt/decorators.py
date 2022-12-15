@@ -15,6 +15,7 @@ from .compat import GraphQLResolveInfo
 from .refresh_token.shortcuts import create_refresh_token, refresh_token_lazy
 from .settings import jwt_settings
 from .utils import delete_cookie, set_cookie
+from cmi.patrons.models import PatronsModel
 
 __all__ = [
     "user_passes_test",
@@ -96,8 +97,10 @@ def token_auth(f):
         context._jwt_token_auth = True
         username = kwargs.get(get_user_model().USERNAME_FIELD)
         ecommerce = kwargs.get('ecommerce')
+        crm = kwargs.get('crm')
+        
         if ecommerce and ecommerce == 'true':
-            user = get_user_model().objects.filter((Q(username__iexact=username) | Q(email__iexact=username)) & Q(ecommerce__iexact=1)).first()
+            user = get_user_model().objects.filter((Q(username__iexact=username) | Q(email__iexact=username)) & Q(ecommerce__iexact=1) & Q(crm__iexact=0)).first()
             if user:
                 if not user.check_password(password):
                     raise exceptions.JSONWebTokenError(
@@ -106,9 +109,20 @@ def token_auth(f):
             else:
                 raise exceptions.JSONWebTokenError(
                     _("Please enter valid credentials"),
-                )                
+                )                  
+        if crm and crm == 'true':
+            user = get_user_model().objects.filter((Q(username__iexact=username) | Q(email__iexact=username)) & Q(ecommerce__iexact=0) & Q(crm__iexact=1)).first()
+            if user:
+                if not user.check_password(password):
+                    raise exceptions.JSONWebTokenError(
+                        _("Please enter valid credentials"),
+                    ) 
+            else:
+                raise exceptions.JSONWebTokenError(
+                    _("Please enter valid credentials"),
+                )
         else:
-            user = get_user_model().objects.filter((Q(username__iexact=username) | Q(email__iexact=username)) & Q(ecommerce__iexact=0)).first()
+            user = get_user_model().objects.filter((Q(username__iexact=username) | Q(email__iexact=username)) & Q(ecommerce__iexact=0) & Q(crm__iexact=0)).first()
             if user:
                 if not user.check_password(password):
                     raise exceptions.JSONWebTokenError(
