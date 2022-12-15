@@ -109,7 +109,7 @@ def token_auth(f):
                 raise exceptions.JSONWebTokenError(
                     _("Please enter valid credentials"),
                 )                  
-        if crm and crm == 'true':
+        elif crm and crm == 'true':
             user = get_user_model().objects.filter((Q(username__iexact=username) | Q(email__iexact=username)) & Q(ecommerce__iexact=0) & Q(crm__iexact=1)).first()
             if user:
                 if not user.check_password(password):
